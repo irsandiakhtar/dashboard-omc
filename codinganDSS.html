@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard DSS Penentuan Start–Off OMC | Bandung Raya</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--navy:#082b68;--blue:#1456a0;--green:#18713b;--orange:#ef9b00;--red:#d8201c;--ink:#14213d;--muted:#60708a;--line:#cbd8e8;--bg:#eef3f9;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+.topbar{background:linear-gradient(110deg,#08275d,#164e98);color:white;padding:18px 24px;display:flex;justify-content:space-between;gap:18px;align-items:center;border-bottom:5px solid #e6edf6}
+.brand{font-size:12px;font-weight:bold;letter-spacing:.8px;opacity:.9}.topbar h1{font-size:clamp(19px,2.3vw,30px);margin:5px 0;text-transform:uppercase}.topbar p{margin:0;font-size:13px;color:#dbe8ff}.top-meta{text-align:right;font-size:12px;line-height:1.6;min-width:180px}
+.wrap{max-width:1600px;margin:auto;padding:16px}.notice{padding:10px 14px;border:1px solid #e8c46b;background:#fff8df;border-radius:8px;font-size:12px;color:#6c4b00;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:12px;margin-bottom:14px}.kpi,.panel,.step{background:white;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 6px #17365d0b}.kpi{padding:15px}.kpi .label{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:bold}.kpi .value{font-size:27px;font-weight:800;margin:8px 0 5px;color:var(--navy)}.kpi small{color:var(--muted);font-size:11px}
+.section-title{font-size:13px;font-weight:800;color:var(--navy);text-transform:uppercase;padding-bottom:9px;border-bottom:1px solid #dce5ef;margin:0 0 12px}
+.pipeline{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:10px;margin-bottom:14px}.step{padding:13px;position:relative}.step-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--blue);margin-bottom:10px}.num{border-radius:50%;width:29px;height:29px;display:grid;place-items:center;background:var(--blue);color:white;font-size:16px;flex-shrink:0}.step:nth-child(1) .num,.step:nth-child(5) .num{background:var(--green)}.step:nth-child(3) .num{background:#34227d}.step:nth-child(4) .num{background:#cf5a08}.step p{font-size:11px;line-height:1.5;margin:6px 0;color:#34445c}.mini{background:#f4f7fc;border-radius:7px;padding:9px;margin-top:8px;font-size:11px;line-height:1.65}.mini b{color:var(--navy)}.meter{height:7px;border-radius:10px;background:#dce6f3;overflow:hidden;margin:7px 0}.meter span{display:block;height:100%;background:linear-gradient(90deg,#16733c,#75bd61);border-radius:10px}
+.grid{display:grid;grid-template-columns:1.05fr 1.2fr 1fr;gap:14px;margin-bottom:14px}.panel{padding:15px;min-width:0}.panel p{font-size:12px;line-height:1.55}.status-box{border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12px;line-height:1.5;border:1px solid}.start{background:#e7f5e9;border-color:#9bcaa5;color:#14592b}.monitor{background:#fff3d4;border-color:#f0cb68;color:#785000}.off{background:#ffe9e7;border-color:#efaaa4;color:#a21b17}.pill{display:inline-block;padding:5px 10px;border-radius:6px;font-weight:bold;font-size:11px}.green{background:#dff2e3;color:#17652e}.yellow{background:#fff0c7;color:#8c5b00}.red{background:#ffe2df;color:#b21d18}.blue{background:#e1edff;color:#174f99}
+#editorTable input{width:100%;min-width:90px;padding:8px;border:1px solid #c6d3e4;border-radius:5px;font:inherit;color:var(--ink);background:#fff}
+#editorTable td:first-child input{min-width:135px}
+table{border-collapse:collapse;width:100%;font-size:11px}th{background:#eaf0f8;color:#163a73;text-align:left}th,td{padding:9px 7px;border-bottom:1px solid #e0e7f0;vertical-align:top}td{line-height:1.4}.table-wrap{overflow-x:auto}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.controls input,.controls select,.controls button{font:inherit;font-size:12px;border:1px solid #c6d3e4;border-radius:6px;padding:9px;background:white;color:var(--ink)}button{cursor:pointer!important}button.primary{background:var(--navy);color:white;border-color:var(--navy)}button:hover{filter:brightness(.96)}
+.chart-box{height:240px;position:relative}.bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}.bullet{padding-left:18px;font-size:12px;line-height:1.65}.footer{background:var(--navy);color:white;padding:11px 16px;font-size:11px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.muted{color:var(--muted)}.tiny{font-size:10px;color:var(--muted)}.table-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.table-actions input{max-width:220px}
+@media(max-width:1100px){.pipeline{grid-template-columns:repeat(3,1fr)}.grid,.bottom{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.topbar{align-items:flex-start;flex-direction:column}.top-meta{text-align:left}.pipeline,.grid,.bottom,.kpis,.two{grid-template-columns:1fr}.wrap{padding:10px}.chart-box{height:220px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div><div class="brand">BMKG · SISTEM PENDUKUNG KEPUTUSAN</div><h1>Pedoman Operasional DSS Penentuan Start–Off OMC</h1><p>Untuk mitigasi kekeringan di wilayah Bandung Raya · Keputusan berbasis data atmosfer, monitoring awan, dan evaluasi curah hujan</p></div>
+  <div class="top-meta"><b>OMC</b> · Operasi Modifikasi Cuaca<br><span id="today"></span><br>Dashboard demonstrasi / data simulasi</div>
+</header>
+<main class="wrap">
+  <div class="notice"><b>Catatan penting:</b> seluruh angka dan hasil keputusan pada halaman ini adalah data contoh untuk demonstrasi, bukan rekomendasi operasional BMKG. Keputusan OMC nyata wajib menggunakan data terverifikasi, SOP, dan penilaian petugas berwenang.</div>
+  <section class="kpis">
+    <div class="kpi"><div class="label">Skor DSS Hari Ini</div><div class="value" id="mainScore">93/100</div><small id="scoreHint">Kondisi mendukung operasi</small></div>
+    <div class="kpi"><div class="label">Rekomendasi Operasi</div><div class="value"><span id="mainStatus" class="pill green">START</span></div><small>Ambang contoh dapat diubah</small></div>
+    <div class="kpi"><div class="label">Total Curah Hujan</div><div class="value"><span id="rainKpi">18.6</span> <small>mm</small></div><small>Akumulasi harian contoh</small></div>
+    <div class="kpi"><div class="label">Tutupan Awan</div><div class="value"><span id="cloudKpi">82</span><small>%</small></div><small>Indikator IFS contoh</small></div>
+    <div class="kpi"><div class="label">Kelembapan RH</div><div class="value"><span id="rhKpi">78</span><small>%</small></div><small>Parameter atmosfer contoh</small></div>
+  </section>
+
+  <h2 class="section-title">Alur pengambilan keputusan operasional</h2>
+  <section class="pipeline">
+    <div class="step"><div class="step-head"><span class="num">1</span> NEED ASSESSMENT</div><p>Apakah wilayah Bandung Raya membutuhkan intervensi OMC?</p><div class="mini"><b>Monitoring kekeringan</b><br>• Hari tanpa hujan (HTH)<br>• Indeks kekeringan<br>• Informasi dampak kekeringan</div><div class="mini"><b>Klimatologi curah hujan</b><br>Analisis curah hujan periode musim kemarau.</div></div>
+    <div class="step"><div class="step-head"><span class="num">2</span> ATMOSPHERIC READINESS</div><p>Apakah kondisi atmosfer mendukung pertumbuhan awan?</p><div class="mini"><b>IFS – Potensi pertumbuhan awan (0–25)</b><br>Cloud cover, convective precipitation, total precipitation</div><div class="mini"><b>Lifted Index (0–20)</b><br>LI &lt; -2: labil; -1 hingga 0: agak labil; LI &gt; 0: stabil</div><div class="mini"><b>RH dan angin</b><br>RH 850/700 hPa, angin 850 hPa dan konvergensi.</div></div>
+    <div class="step"><div class="step-head"><span class="num">3</span> CLOUD READINESS</div><p>Apakah terdapat awan target potensial di wilayah Bandung Raya?</p><div class="mini"><b>Monitoring awan Himawari-9 (0–15)</b><br>Cloud Top Temperature (CTT), pertumbuhan awan, kontinuitas/organisasi, posisi awan target.</div><div class="mini"><b>Skor kesiapan awan</b><div class="meter"><span id="cloudMeter" style="width:86%"></span></div><span id="cloudScoreText">13/15 · Tinggi</span></div></div>
+    <div class="step"><div class="step-head"><span class="num">4</span> OPERATIONAL DECISION</div><p>Skor DSS total 0–100 menentukan status rekomendasi.</p><div class="status-box start"><b>START OMC · Skor ≥ 70</b><br>Kondisi atmosfer dan awan sangat mendukung.</div><div class="status-box monitor"><b>MONITORING / KONDISIONAL · 40–69</b><br>Kondisi sebagian terpenuhi; pantau kembali.</div><div class="status-box off"><b>OFF OMC · Skor &lt; 40</b><br>Target tidak tercapai atau kondisi tidak mendukung.</div></div>
+    <div class="step"><div class="step-head"><span class="num">5</span> VERIFICATION & EVALUATION</div><p>Apakah operasi mencapai tujuan yang diharapkan?</p><div class="mini"><b>Evaluasi curah hujan</b><br>Bandingkan hujan observasi dan kondisi pembanding.</div><div class="mini"><b>Analisis hasil</b><br>Evaluasi spasial-temporal, analisis efektivitas OMC, serta umpan balik ke operasi berikutnya.</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h3 class="section-title">Parameter atmosfer & skor</h3>
+      <div class="controls"><label class="tiny">Pilih tanggal<br><input id="datePick" type="date" value="2026-07-28"></label><label class="tiny">Skenario contoh<br><select id="scenario"><option value="93">28 Jul · Skor 93 (START)</option><option value="97">29 Jul · Skor 97 (START)</option><option value="77">30 Jul · Skor 77 (LANJUT)</option><option value="70">31 Jul · Skor 70 (MONITORING)</option><option value="43">1 Agu · Skor 43 (OFF)</option><option value="28">Skenario tambahan · Skor 28 (OFF)</option></select></label></div>
+      <div class="table-wrap"><table><thead><tr><th>Parameter</th><th>Nilai contoh</th><th>Bobot maks.</th></tr></thead><tbody id="parameterRows">
+      <tr><td>IFS – Potensi awan/hujan</td><td>23</td><td>25</td></tr><tr><td>Lifted Index (LI)</td><td>20</td><td>20</td></tr><tr><td>RH 850 hPa</td><td>15</td><td>15</td></tr><tr><td>RH 700 hPa</td><td>12</td><td>15</td></tr><tr><td>Angin 850 hPa</td><td>10</td><td>10</td></tr><tr><td>Citra Himawari-9</td><td>13</td><td>15</td></tr></tbody></table></div>
+      <p class="muted tiny">Bobot di atas meniru contoh pada infografik. Definisi, normalisasi, dan ambang harus divalidasi sebelum penggunaan operasional.</p>
+      <div class="status-box start" id="decisionBox"><b>START OMC</b><br>Skor 93: kondisi contoh mendukung operasi.</div>
+    </div>
+    <div class="panel">
+      <h3 class="section-title">Tren skor DSS harian</h3><div class="chart-box"><canvas id="scoreChart"></canvas></div>
+      <p class="muted tiny">Data contoh periode 28 Juli–1 Agustus 2026.</p>
+    </div>
+    <div class="panel">
+      <h3 class="section-title">Observasi curah hujan harian</h3><div class="chart-box"><canvas id="rainChart"></canvas></div>
+      <p class="muted tiny">Contoh akumulasi curah hujan; bukan observasi aktual.</p>
+      <div class="two"><div class="mini"><b>Total 5 hari</b><br><span id="rainTotal">67.4 mm</span></div><div class="mini"><b>Rata-rata harian</b><br><span id="rainAvg">13.5 mm</span></div></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h3 class="section-title">Rekomendasi DSS</h3>
+      <div class="status-box start"><b>START (Skor ≥ 70)</b><br>Skor tinggi dan seluruh indikator kritis telah diverifikasi.</div>
+      <div class="status-box monitor"><b>MONITORING (40–69)</b><br>Lakukan pembaruan data dan evaluasi ulang kondisi atmosfer.</div>
+      <div class="status-box off"><b>OFF (Skor &lt; 40)</b><br>Skor rendah pada skema contoh; ikuti keputusan petugas berwenang.</div>
+      <p><b>Indikator kunci:</b> potensi hujan, stabilitas atmosfer, kelembapan, angin, serta ketersediaan awan target.</p>
+    </div>
+    <div class="panel">
+      <h3 class="section-title">Timeline keputusan operasi</h3><div class="chart-box"><canvas id="timelineChart"></canvas></div>
+      <p class="muted tiny">Gunakan filter skenario untuk melihat perubahan rekomendasi pada kartu utama.</p>
+    </div>
+    <div class="panel">
+      <h3 class="section-title">Wilayah target & catatan</h3>
+      <div class="mini"><b>Wilayah target:</b><br>• Kota Bandung<br>• Kabupaten Bandung<br>• Kabupaten Bandung Barat<br>• Kota Cimahi</div>
+      <div class="mini"><b>Prinsip OMC:</b><br>Intervensi awan potensial berdasarkan evaluasi atmosfer, kesiapan awan, keselamatan penerbangan, serta koordinasi instansi terkait.</div>
+      <div class="mini"><b>Pembaruan terakhir</b><br><span id="updated"></span></div>
+    </div>
+  </section>
+
+  <section class="bottom">
+    <div class="panel"><h3 class="section-title">Hasil pembahasan</h3><ul class="bullet"><li>Skor DSS berubah mengikuti skenario contoh harian.</li><li>Potensi atmosfer dan kelembapan merupakan komponen penilaian.</li><li>Penurunan skor perlu ditinjau bersama ketersediaan awan target dan kebutuhan wilayah.</li><li>Efektivitas operasi tidak dapat disimpulkan dari skor DSS saja; perlu verifikasi hujan dan metode pembanding.</li></ul></div>
+    <div class="panel"><h3 class="section-title">Kesimpulan contoh</h3><ol class="bullet"><li>Skor 70 ke atas masuk kategori START pada skema ilustratif.</li><li>Skor 40–69 masuk kategori MONITORING/KONDISIONAL.</li><li>Skor di bawah 40 masuk kategori OFF.</li><li>Rekomendasi akhir harus mempertimbangkan data terkini dan evaluasi petugas.</li></ol></div>
+    <div class="panel"><h3 class="section-title">Rekomendasi pengembangan</h3><ul class="bullet"><li>Integrasikan data observasi dan model numerik resmi.</li><li>Tambahkan citra Himawari terbaru dan produk analisis awan.</li><li>Tambahkan peta GIS wilayah operasi dan titik observasi hujan.</li><li>Simpan log perubahan skor dan alasan keputusan.</li><li>Uji performa DSS terhadap kejadian historis sebelum digunakan.</li></ul></div>
+  </section>
+
+  <section class="panel" style="margin-bottom:14px">
+    <h3 class="section-title">Editor data dan skor DSS</h3>
+    <p class="muted">Ubah skor, curah hujan, tutupan awan, dan RH pada tabel berikut. Klik <b>Terapkan perubahan</b> untuk memperbarui KPI dan grafik. Perubahan hanya tersimpan selama halaman masih terbuka; unduh CSV untuk menyimpan tabel riwayat.</p>
+    <div class="table-wrap"><table id="editorTable">
+      <thead><tr><th>Tanggal</th><th>Skor DSS (0–100)</th><th>Curah hujan (mm)</th><th>Tutupan awan (%)</th><th>RH (%)</th></tr></thead>
+      <tbody>
+        <tr><td><input value="28 Juli 2026" aria-label="Tanggal 1"></td><td><input type="number" min="0" max="100" value="93"></td><td><input type="number" min="0" step="0.1" value="18.6"></td><td><input type="number" min="0" max="100" value="82"></td><td><input type="number" min="0" max="100" value="78"></td></tr>
+        <tr><td><input value="29 Juli 2026" aria-label="Tanggal 2"></td><td><input type="number" min="0" max="100" value="97"></td><td><input type="number" min="0" step="0.1" value="21.2"></td><td><input type="number" min="0" max="100" value="88"></td><td><input type="number" min="0" max="100" value="81"></td></tr>
+        <tr><td><input value="30 Juli 2026" aria-label="Tanggal 3"></td><td><input type="number" min="0" max="100" value="77"></td><td><input type="number" min="0" step="0.1" value="13.4"></td><td><input type="number" min="0" max="100" value="68"></td><td><input type="number" min="0" max="100" value="70"></td></tr>
+        <tr><td><input value="31 Juli 2026" aria-label="Tanggal 4"></td><td><input type="number" min="0" max="100" value="70"></td><td><input type="number" min="0" step="0.1" value="8.1"></td><td><input type="number" min="0" max="100" value="55"></td><td><input type="number" min="0" max="100" value="64"></td></tr>
+        <tr><td><input value="01 Agustus 2026" aria-label="Tanggal 5"></td><td><input type="number" min="0" max="100" value="43"></td><td><input type="number" min="0" step="0.1" value="6.1"></td><td><input type="number" min="0" max="100" value="35"></td><td><input type="number" min="0" max="100" value="58"></td></tr>
+      </tbody>
+    </table></div>
+    <div class="controls" style="margin-top:12px">
+      <button class="primary" id="applyEdits">Terapkan perubahan</button>
+      <button id="resetEdits">Kembalikan data contoh</button>
+      <span id="editMessage" class="tiny" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-bottom:14px">
+    <h3 class="section-title">Hasil DSS scoring harian</h3>
+    <div class="controls"><input id="searchTable" placeholder="Cari tanggal atau rekomendasi..."><button class="primary" id="downloadCsv">Unduh data CSV</button><button id="resetBtn">Reset skenario</button></div>
+    <div class="table-wrap"><table id="historyTable"><thead><tr><th>Tanggal</th><th>Total skor (0–100)</th><th>Rekomendasi</th><th>Keterangan singkat</th></tr></thead><tbody>
+      <tr><td>28 Juli 2026</td><td>93</td><td><span class="pill green">START</span></td><td>Potensi awan tinggi; atmosfer labil; kelembapan cukup baik.</td></tr>
+      <tr><td>29 Juli 2026</td><td>97</td><td><span class="pill green">START</span></td><td>Kondisi atmosfer dan awan sangat baik untuk dipantau.</td></tr>
+      <tr><td>30 Juli 2026</td><td>77</td><td><span class="pill yellow">LANJUT</span></td><td>Potensi awan menurun; indikator masih cukup mendukung.</td></tr>
+      <tr><td>31 Juli 2026</td><td>70</td><td><span class="pill yellow">MONITORING</span></td><td>Kondisi mendekati ambang; perlu verifikasi tambahan.</td></tr>
+      <tr><td>01 Agustus 2026</td><td>43</td><td><span class="pill red">OFF</span></td><td>Potensi awan berkurang; lakukan pemantauan lanjutan.</td></tr>
+    </tbody></table></div>
+  </section>
+</main>
+<footer class="footer"><span>Dashboard DSS OMC · Contoh antarmuka untuk pengembangan</span><span>Sumber konsep: infografik yang diberikan pengguna · Data angka merupakan simulasi</span><span>Agustus 2026</span></footer>
+<script>
+const dates=['28 Jul','29 Jul','30 Jul','31 Jul','1 Agu'];
+const scores=[93,97,77,70,43], rain=[18.6,21.2,13.4,8.1,6.1];
+const fmt=(n)=>Number(n).toLocaleString('id-ID',{maximumFractionDigits:1});
+document.getElementById('today').textContent='Diperbarui: '+new Date().toLocaleString('id-ID');
+document.getElementById('updated').textContent=new Date().toLocaleString('id-ID');
+const statusFor=s=>s>=70?(s>=90?'START':'LANJUT'):s>=40?'MONITORING':'OFF';
+const colorsFor=s=>s>=70?'#18713b':s>=40?'#ef9b00':'#d8201c';
+const scoreChart=new Chart(document.getElementById('scoreChart'),{type:'line',data:{labels:dates,datasets:[{label:'Skor DSS',data:scores,borderColor:'#1456a0',backgroundColor:'rgba(20,86,160,.12)',fill:true,tension:.3,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{display:false}}}});
+const rainChart=new Chart(document.getElementById('rainChart'),{type:'bar',data:{labels:dates,datasets:[{label:'Curah hujan (mm)',data:rain,backgroundColor:'#2784c7',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+const timelineChart=new Chart(document.getElementById('timelineChart'),{type:'bar',data:{labels:dates,datasets:[{label:'Skor DSS',data:scores,backgroundColor:scores.map(colorsFor),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{display:false}}}});
+function setScenario(s){
+ const status=statusFor(s), el=document.getElementById('mainStatus');
+ document.getElementById('mainScore').textContent=s+'/100';el.textContent=status;el.className='pill '+(s>=70?'green':s>=40?'yellow':'red');
+ document.getElementById('scoreHint').textContent=s>=70?'Kondisi contoh mendukung':s>=40?'Perlu pemantauan lanjutan':'Kondisi contoh tidak mendukung';
+ document.getElementById('rainKpi').textContent=fmt(s>=90?18.6:s>=70?13.4:s>=40?8.1:2.4);
+ document.getElementById('cloudKpi').textContent=s>=90?82:s>=70?68:s>=40?45:22;
+ document.getElementById('rhKpi').textContent=s>=90?78:s>=70?70:s>=40?61:49;
+ const box=document.getElementById('decisionBox');box.className='status-box '+(s>=70?'start':s>=40?'monitor':'off');box.innerHTML='<b>'+status+' OMC</b><br>Skor '+s+': '+(s>=70?'indikator contoh mendukung, tetap verifikasi data aktual.':s>=40?'indikator sebagian terpenuhi; lakukan monitoring.':'indikator contoh tidak mendukung; evaluasi kembali.');
+ const vals=s>=90?[23,20,15,12,10,13]:s>=70?[20,15,12,10,8,12]:s>=40?[13,8,8,7,4,3]:[7,4,5,4,3,2];
+ document.querySelectorAll('#parameterRows tr').forEach((tr,i)=>tr.cells[1].textContent=vals[i]);
+ document.getElementById('cloudMeter').style.width=(Math.min(100,Math.round(vals[5]/15*100)))+'%';document.getElementById('cloudScoreText').textContent=vals[5]+'/15 · '+(vals[5]>=11?'Tinggi':vals[5]>=6?'Sedang':'Rendah');
+}
+document.getElementById('scenario').addEventListener('change',e=>setScenario(Number(e.target.value)));
+document.getElementById('searchTable').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('#historyTable tbody tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(q)?'':'none')});
+document.getElementById('downloadCsv').addEventListener('click',()=>{const rows=[['Tanggal','Skor DSS','Rekomendasi','Keterangan'],...Array.from(document.querySelectorAll('#historyTable tbody tr')).map(r=>Array.from(r.cells).map(c=>c.innerText.trim()))];const csv=rows.map(r=>r.map(v=>'"'+v.replaceAll('"','""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));a.download='hasil_dss_omc_simulasi.csv';a.click();URL.revokeObjectURL(a.href)});
+document.getElementById('resetBtn').addEventListener('click',()=>{document.getElementById('scenario').value='93';document.getElementById('searchTable').value='';document.querySelectorAll('#historyTable tbody tr').forEach(r=>r.style.display='');setScenario(93)});
+
+const originalEditor = [
+ ["28 Juli 2026",93,18.6,82,78],
+ ["29 Juli 2026",97,21.2,88,81],
+ ["30 Juli 2026",77,13.4,68,70],
+ ["31 Juli 2026",70,8.1,55,64],
+ ["01 Agustus 2026",43,6.1,35,58]
+];
+function applyEditorData(){
+ const rows=Array.from(document.querySelectorAll('#editorTable tbody tr'));
+ const data=rows.map((r)=>Array.from(r.querySelectorAll('input')).map(i=>i.value));
+ for(let i=0;i<data.length;i++){
+   const score=Number(data[i][1]), rr=Number(data[i][2]), cloud=Number(data[i][3]), rh=Number(data[i][4]);
+   if(!data[i][0].trim() || ![score,rr,cloud,rh].every(Number.isFinite) || score<0 || score>100 || rr<0 || cloud<0 || cloud>100 || rh<0 || rh>100){
+     document.getElementById('editMessage').textContent='Periksa input: skor 0–100, hujan ≥ 0, tutupan awan dan RH 0–100.';
+     return;
+   }
+ }
+ const newScores=data.map(r=>Number(r[1])), newRain=data.map(r=>Number(r[2]));
+ scoreChart.data.labels=data.map(r=>r[0].replace('2026','').trim());
+ scoreChart.data.datasets[0].data=newScores;scoreChart.update();
+ rainChart.data.labels=scoreChart.data.labels;rainChart.data.datasets[0].data=newRain;rainChart.update();
+ timelineChart.data.labels=scoreChart.data.labels;timelineChart.data.datasets[0].data=newScores;timelineChart.data.datasets[0].backgroundColor=newScores.map(colorsFor);timelineChart.update();
+ const selected=newScores[0], selectedRain=newRain[0];
+ setScenario(selected);
+ document.getElementById('rainKpi').textContent=fmt(selectedRain);
+ document.getElementById('cloudKpi').textContent=data[0][3];
+ document.getElementById('rhKpi').textContent=data[0][4];
+ document.getElementById('rainTotal').textContent=fmt(newRain.reduce((a,b)=>a+b,0))+' mm';
+ document.getElementById('rainAvg').textContent=fmt(newRain.reduce((a,b)=>a+b,0)/newRain.length)+' mm';
+ const history=document.querySelector('#historyTable tbody');
+ history.innerHTML=data.map(r=>{
+   const s=Number(r[1]), st=statusFor(s), cls=s>=70?'green':s>=40?'yellow':'red';
+   return '<tr><td>'+escapeHtml(r[0])+'</td><td>'+s+'</td><td><span class="pill '+cls+'">'+st+'</span></td><td>Data diperbarui pengguna; evaluasi berdasarkan skor dan parameter yang dimasukkan.</td></tr>';
+ }).join('');
+ document.getElementById('scenario').value=String(selected);
+ document.getElementById('editMessage').textContent='Perubahan diterapkan. KPI memakai baris pertama sebagai data hari terpilih.';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+document.getElementById('applyEdits').addEventListener('click',applyEditorData);
+document.getElementById('resetEdits').addEventListener('click',()=>{
+ document.querySelectorAll('#editorTable tbody tr').forEach((tr,i)=>tr.querySelectorAll('input').forEach((input,j)=>input.value=originalEditor[i][j]));
+ applyEditorData();
+});
+setScenario(93);
+</script>
+</body>
+</html>
